@@ -16,6 +16,13 @@ void main() async {
   await GetStorage.init();
   await initDi();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+      systemNavigationBarColor: Colors.black,
+      statusBarColor: Colors.white,
+      statusBarIconBrightness: Brightness.dark,
+    ),
+  );
   runApp(MyApp(initialRoute: "/"));
 }
 

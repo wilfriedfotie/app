@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 
@@ -23,6 +24,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   final formGlobalKey = GlobalKey<FormState>();
   bool isloading = false;
   AnimationController? animationcontroller;
+  final box = GetStorage();
+
   @override
   void initState() {
     // TODO: implement initState
@@ -164,6 +167,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                                     },
                                     obscureText: true,
                                   ),
+
                                   Container(
                                     child: SizedBox(
                                       height: 45,

@@ -6,12 +6,14 @@ import 'package:LASYLAB/core/components/images.dart';
 import 'package:LASYLAB/core/components/styling.dart';
 import 'package:LASYLAB/core/size_config.dart';
 import 'package:LASYLAB/core/utils.dart';
+import 'package:LASYLAB/feature/authentication/presentation/pages/choose_strong_topics.dart';
 import 'package:LASYLAB/services/auth_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:intl/intl.dart';
@@ -176,6 +178,7 @@ class _RegisterPageState extends State<RegisterPage>
   String selectedschoolitem = "";
   int step = 1;
   int studentClass = 0;
+
   @override
   void initState() {
     super.initState();
@@ -207,6 +210,11 @@ class _RegisterPageState extends State<RegisterPage>
   void dispose() {
     // TODO: implement dispose
     animationcontroller!.dispose();
+    phone.dispose();
+    name.dispose();
+    school.dispose();
+    birthdate.dispose();
+    password.dispose();
     super.dispose();
   }
 
@@ -348,6 +356,8 @@ class _RegisterPageState extends State<RegisterPage>
                                                       });
                                                     },
                                                     child: Container(
+                                                      padding: EdgeInsets.only(
+                                                          top: 10, left: 5),
                                                       height: dimensH(
                                                           screenSize.height *
                                                               .12,
@@ -359,24 +369,20 @@ class _RegisterPageState extends State<RegisterPage>
                                                               .24,
                                                           sm: screenSize.width *
                                                               .24),
+                                                      child: SvgPicture.asset(
+                                                          Images
+                                                              .eleveIllustration),
                                                       decoration: BoxDecoration(
-                                                          image: DecorationImage(
-                                                              image: AssetImage(
-                                                                  Images
-                                                                      .student_select),
-                                                              fit:
-                                                                  BoxFit.cover),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(16),
-                                                          border: Border.all(
-                                                              width: 1,
-                                                              style: BorderStyle
-                                                                  .solid,
-                                                              color: AppTheme
-                                                                  .borderColor),
-                                                          color: AppTheme
-                                                              .primaryLightColor),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(16),
+                                                        border: Border.all(
+                                                            width: 1,
+                                                            style: BorderStyle
+                                                                .solid,
+                                                            color: AppTheme
+                                                                .borderColor),
+                                                      ),
                                                     ),
                                                   ),
                                                   SizedBox(
@@ -413,6 +419,8 @@ class _RegisterPageState extends State<RegisterPage>
                                                       });
                                                     },
                                                     child: Container(
+                                                      padding: EdgeInsets.only(
+                                                          top: 10, left: 5),
                                                       height: dimensH(
                                                           screenSize.height *
                                                               .12,
@@ -424,6 +432,9 @@ class _RegisterPageState extends State<RegisterPage>
                                                               .24,
                                                           sm: screenSize.width *
                                                               .3),
+                                                      child: SvgPicture.asset(
+                                                          Images
+                                                              .parentIllustration),
                                                       decoration: BoxDecoration(
                                                           borderRadius:
                                                               BorderRadius
@@ -873,8 +884,6 @@ class _RegisterPageState extends State<RegisterPage>
                                     ],
                                   ),
                                 ),
-                                InputPhoneNumberFormField(
-                                    controller: phone, label: "Téléphone"),
                                 CustomTextFormField(
                                   label: "Téléphone",
                                   labelWidget: Container(),
@@ -889,7 +898,7 @@ class _RegisterPageState extends State<RegisterPage>
                                     }
                                   },
                                   keyboardType: TextInputType.number,
-                                  prefixText: '+237',
+                                  prefixText: '+237 ',
                                   inputFormatter: <TextInputFormatter>[
                                     FilteringTextInputFormatter.digitsOnly
                                   ],
@@ -1051,145 +1060,140 @@ class _RegisterPageState extends State<RegisterPage>
                                     ],
                                   ),
                                 ),
-                                isFilled(
-                                            isSelectedschoolitem:
-                                                selectedschoolitem !=
-                                                    "Autre") ==
-                                        true
-                                    ? Container(
-                                        color: Colors.white,
-                                        margin: const EdgeInsets.only(
-                                          left: 20.0,
-                                          right: 20.0,
-                                          top: 15,
-                                          bottom: 30,
-                                        ),
-                                        child: SizedBox(
-                                          height: screenSize.height * .06,
-                                          width: double.infinity,
-                                          child: FancyButton(
-                                            child: isloading
-                                                ? Center(
-                                                    child: SpinKitWave(
-                                                      color: Colors.white,
-                                                      size: 25,
-                                                      controller:
-                                                          animationcontroller,
-                                                    ),
-                                                  )
-                                                : Center(
-                                                    child: Text(
-                                                      "Terminer",
-                                                      style:
-                                                          GoogleFonts.openSans(
-                                                        color: Colors.white,
-                                                        textStyle: TextStyle(
-                                                          fontSize: 20,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                      ),
-                                                    ),
+                                Container(
+                                  margin: const EdgeInsets.only(
+                                    left: 20.0,
+                                    right: 20.0,
+                                    top: 15,
+                                    bottom: 30,
+                                  ),
+                                  child: SizedBox(
+                                    height: screenSize.height * .06,
+                                    width: double.infinity,
+                                    child: FancyButton(
+                                      child: isloading
+                                          ? Center(
+                                              child: SpinKitWave(
+                                                color: Colors.white,
+                                                size: 25,
+                                                controller: animationcontroller,
+                                              ),
+                                            )
+                                          : Center(
+                                              child: Text(
+                                                "Terminer",
+                                                style: GoogleFonts.openSans(
+                                                  color: Colors.white,
+                                                  textStyle: TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.bold,
                                                   ),
-                                            size: 18,
-                                            color: HexColor("#58CC02"),
-                                            onPressed: () {
-                                              Navigator.of(context)
-                                                  .pushNamed("/welcome_fees");
-                                            },
-                                            // : () async {
-                                            //     if (formGlobalKey
-                                            //         .currentState!
-                                            //         .validate()) {
-                                            //       //loader
-                                            //       /*       bool register =await auth.signup(email, password);
-                                            // if(register){
-                                            //   Navigator.of(context)
-                                            // .pushNamed("/welcome_fees");
-                                            // }*/
-                                            //       try {
-                                            //         setState(() {
-                                            //           isloading = true;
-                                            //         });
-                                            //         bool result =
-                                            //             await DBService()
-                                            //                 .verifyIfPhoneExist(
-                                            //                     phone.text);
-                                            //         setState(() {
-                                            //           isloading = false;
-                                            //         });
-                                            //         Logger().d("result " +
-                                            //             result.toString());
-                                            //         if (result) {
-                                            //           Fluttertoast.showToast(
-                                            //               msg:
-                                            //                   "Ce numéro de téléphone existe déjà",
-                                            //               toastLength: Toast
-                                            //                   .LENGTH_SHORT,
-                                            //               gravity:
-                                            //                   ToastGravity
-                                            //                       .BOTTOM,
-                                            //               timeInSecForIosWeb:
-                                            //                   4,
-                                            //               backgroundColor:
-                                            //                   HexColor(
-                                            //                       "#58CC02"),
-                                            //               textColor:
-                                            //                   Colors.white,
-                                            //               fontSize: 16.0);
-                                            //         } else {
-                                            //           Navigator.of(context).push(
-                                            //               MaterialPageRoute(
-                                            //                   builder:
-                                            //                       (context) =>
-                                            //                           OTPScreen(
-                                            //                             nom:
-                                            //                                 name.text,
-                                            //                             prenom:
-                                            //                                 surName.text,
-                                            //                             telephone:
-                                            //                                 phone.text,
-                                            //                             ecole: selectedschoolitem == "Autre"
-                                            //                                 ? school.text
-                                            //                                 : selectedschoolitem,
-                                            //                             classe:
-                                            //                                 selectedclassitem,
-                                            //                             password:
-                                            //                                 password.text,
-                                            //                             birthdate:
-                                            //                                 birthdate.text,
-                                            //                           )));
-                                            //         }
-                                            //       } catch (e) {
-                                            //         Logger().d(e);
-                                            //         setState(() {
-                                            //           isloading = false;
-                                            //         });
-                                            //         Fluttertoast.showToast(
-                                            //             msg:
-                                            //                 "Une erreur est survenue",
-                                            //             toastLength: Toast
-                                            //                 .LENGTH_SHORT,
-                                            //             gravity:
-                                            //                 ToastGravity
-                                            //                     .BOTTOM,
-                                            //             timeInSecForIosWeb:
-                                            //                 4,
-                                            //             backgroundColor:
-                                            //                 HexColor(
-                                            //                     "#58CC02"),
-                                            //             textColor:
-                                            //                 Colors.white,
-                                            //             fontSize: 16.0);
-                                            //       }
-                                            //     }
-                                            //   },
-                                            duration: const Duration(
-                                                milliseconds: 160),
-                                          ),
-                                        ),
-                                      )
-                                    : Container(),
+                                                ),
+                                              ),
+                                            ),
+                                      size: 18,
+                                      color: !isFilled(
+                                          isSelectedschoolitem:
+                                          selectedschoolitem !=
+                                              "Autre")
+                                          ? Colors.grey
+                                          : HexColor("#58CC02"),
+                                      onPressed:() {
+                                        Navigator.of(context)
+                                            .pushNamed(ChooseStrongTopics.routeName);
+                                      },
+                                      // : () async {
+                                      //     if (formGlobalKey
+                                      //         .currentState!
+                                      //         .validate()) {
+                                      //       //loader
+                                      //       /*       bool register =await auth.signup(email, password);
+                                      // if(register){
+                                      //   Navigator.of(context)
+                                      // .pushNamed("/welcome_fees");
+                                      // }*/
+                                      //       try {
+                                      //         setState(() {
+                                      //           isloading = true;
+                                      //         });
+                                      //         bool result =
+                                      //             await DBService()
+                                      //                 .verifyIfPhoneExist(
+                                      //                     phone.text);
+                                      //         setState(() {
+                                      //           isloading = false;
+                                      //         });
+                                      //         Logger().d("result " +
+                                      //             result.toString());
+                                      //         if (result) {
+                                      //           Fluttertoast.showToast(
+                                      //               msg:
+                                      //                   "Ce numéro de téléphone existe déjà",
+                                      //               toastLength: Toast
+                                      //                   .LENGTH_SHORT,
+                                      //               gravity:
+                                      //                   ToastGravity
+                                      //                       .BOTTOM,
+                                      //               timeInSecForIosWeb:
+                                      //                   4,
+                                      //               backgroundColor:
+                                      //                   HexColor(
+                                      //                       "#58CC02"),
+                                      //               textColor:
+                                      //                   Colors.white,
+                                      //               fontSize: 16.0);
+                                      //         } else {
+                                      //           Navigator.of(context).push(
+                                      //               MaterialPageRoute(
+                                      //                   builder:
+                                      //                       (context) =>
+                                      //                           OTPScreen(
+                                      //                             nom:
+                                      //                                 name.text,
+                                      //                             prenom:
+                                      //                                 surName.text,
+                                      //                             telephone:
+                                      //                                 phone.text,
+                                      //                             ecole: selectedschoolitem == "Autre"
+                                      //                                 ? school.text
+                                      //                                 : selectedschoolitem,
+                                      //                             classe:
+                                      //                                 selectedclassitem,
+                                      //                             password:
+                                      //                                 password.text,
+                                      //                             birthdate:
+                                      //                                 birthdate.text,
+                                      //                           )));
+                                      //         }
+                                      //       } catch (e) {
+                                      //         Logger().d(e);
+                                      //         setState(() {
+                                      //           isloading = false;
+                                      //         });
+                                      //         Fluttertoast.showToast(
+                                      //             msg:
+                                      //                 "Une erreur est survenue",
+                                      //             toastLength: Toast
+                                      //                 .LENGTH_SHORT,
+                                      //             gravity:
+                                      //                 ToastGravity
+                                      //                     .BOTTOM,
+                                      //             timeInSecForIosWeb:
+                                      //                 4,
+                                      //             backgroundColor:
+                                      //                 HexColor(
+                                      //                     "#58CC02"),
+                                      //             textColor:
+                                      //                 Colors.white,
+                                      //             fontSize: 16.0);
+                                      //       }
+                                      //     }
+                                      //   },
+                                      duration:
+                                          const Duration(milliseconds: 160),
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           )

@@ -5,18 +5,19 @@ class FancyButton extends StatefulWidget {
   final Widget child;
   final Color color;
   final Duration duration;
-  final VoidCallback onPressed;
-  final double size;
+  final VoidCallback? onPressed;
+  final double size, horzPadding;
   final int? counter;
   final Color? counterColor;
 
   const FancyButton(
       {Key? key,
       required this.child,
-      required this.size,
-      required this.color,
-      required this.duration,
-      required this.onPressed,
+       this.size = 18,
+       this.color = AppTheme.primaryColor,
+        this.horzPadding = 17,
+       this.duration = const Duration(milliseconds: 160),
+       this.onPressed,
       this.counter,
       this.counterColor})
       : super(key: key);
@@ -87,7 +88,7 @@ class _FancyButtonState extends State<FancyButton>
     if (widget.onPressed != null) {
       _downTicker.whenComplete(() {
         _animationController.animateTo(0.0);
-        widget.onPressed.call();
+        widget.onPressed?.call();
       });
     }
   }
@@ -109,7 +110,7 @@ class _FancyButtonState extends State<FancyButton>
       height: 60,
       decoration: BoxDecoration(
         //color: Colors.black87,
-        color: AppTheme.grayColor,
+        color: AppTheme.grayColor ,
         borderRadius: radius,
       ),
       child: GestureDetector(
@@ -163,8 +164,7 @@ class _FancyButtonState extends State<FancyButton>
                       ),
                       Padding(
                         padding: EdgeInsets.symmetric(
-                          vertical: vertPadding,
-                          horizontal: horzPadding,
+                          horizontal: widget.horzPadding,
                         ),
                         child: widget.child,
                       ),
@@ -207,3 +207,5 @@ class _FancyButtonState extends State<FancyButton>
     return HSLColor.fromAHSL(hslColor.alpha, h, s, l).toColor();
   }
 }
+
+

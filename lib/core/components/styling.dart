@@ -9,6 +9,7 @@ class AppTheme {
   static const Color primaryColor = Color(0xff58CC02);
   static const Color primaryLightColor = Color(0xffD7FFB8);
   static const Color secondaryColor = Color(0xff58A700);
+  static const Color secondaryLightBg = Color(0xff84D8FF);
 
   static const Color whiteColor = Color(0xffFFFFFF);
   static const Color blackColor = Color(0xff000000);
@@ -31,6 +32,10 @@ class AppTheme {
   static final ThemeData lightTheme = ThemeData(
     fontFamily: GoogleFonts.nunito().fontFamily,
     primaryColor: primaryColor,
+    textTheme: TextTheme(
+      displaySmall:  TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+      bodyLarge:  TextStyle(fontSize: 16, fontWeight: FontWeight.w600,color: Colors.black),
+    ),
     primaryColorLight: primaryLightColor,
     primaryColorDark: secondaryColor,
     brightness: Brightness.light,

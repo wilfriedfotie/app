@@ -110,6 +110,7 @@ class _VideoCourseReadingState extends State<VideoCourseReading>
                   Container(
                       height: screenSize.height - appBar.preferredSize.height,
                       alignment: Alignment.center,
+
                       color: AppTheme.blueColor),
                   Positioned(
                     bottom: dimensH(0),

@@ -1,3 +1,4 @@
+import 'package:LASYLAB/feature/authentication/presentation/pages/choose_strong_topics.dart';
 import 'package:LASYLAB/views/see_answer.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -37,7 +38,7 @@ final routes = {
   "/welcome_fees": (BuildContext context) => WelcomeFees(),
   "/fees_formula": (BuildContext context) => FeesFormula(),
   "/menu": (BuildContext context) => Menu(),
-  "/home": (BuildContext context) => HomePage(),
+  HomePage.routeName: (BuildContext context) => HomePage(),
   "/activities": (BuildContext context) => ActivitiesPage(),
   "/revisions": (BuildContext context) => DetailsCourseRevision(),
   "/chat": (BuildContext context) => ChatPage(),
@@ -54,4 +55,5 @@ final routes = {
   "/payment_registration_type": (BuildContext context) => PaymentIntroPage(),
   "/see_answer_quiz": (BuildContext context) => SeeQuizAnswer(),
   "/course_reading": (BuildContext context) => CourseReading(),
+  ChooseStrongTopics.routeName: (BuildContext context) => ChooseStrongTopics(),
 };
