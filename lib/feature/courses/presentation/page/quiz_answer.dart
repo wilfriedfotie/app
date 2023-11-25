@@ -3,11 +3,8 @@ import 'package:LASYLAB/components/quizdialog.dart';
 import 'package:LASYLAB/core/components/styling.dart';
 import 'package:LASYLAB/feature/courses/presentation/widgets/quiz_answer_widget.dart';
 import 'package:LASYLAB/models/question.dart';
-import 'package:LASYLAB/services/database_service.dart';
 import 'package:LASYLAB/views/congratulation.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -30,72 +27,17 @@ class _QuizAnswerState extends State<QuizTest> with TickerProviderStateMixin {
   int nbretrouves = 0;
   double ratio = 0;
 
-  //pour l'audio
-  AudioPlayer audioPlayer = AudioPlayer();
-  PlayerState audioPlayerState = PlayerState.paused;
-  AudioCache? audioCache;
-  String path1 = "audio/duolingo_correct.mp3";
-  String path2 = "audio/duolingo_false.mp3";
-  @override
-  void initState() {
-    super.initState();
-    SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
-        systemNavigationBarColor: Colors.black,
-        statusBarColor: Colors.white,
-        statusBarIconBrightness: Brightness.dark,
-      ),
-    );
-    animationcontroller = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 1200));
-    pageController = PageController(initialPage: 0);
-    var result = DBService().getQuiz().then((value) {
-      if (value != null) {
-        //affectation du contenu
-        setState(() {
-          quest = value.questions;
-        });
-      } else {
-        //erreur
-        Fluttertoast.showToast(
-            msg: "Erreur",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 4,
-            backgroundColor: HexColor("#58CC02"),
-            textColor: Colors.white,
-            fontSize: 16.0);
-      }
-    });
-
-    audioCache = audioPlayer.audioCache;
-    audioPlayer.onPlayerStateChanged.listen((PlayerState s) {
-      if (mounted) {
-        setState(() {
-          audioPlayerState = s;
-        });
-      }
-    });
-  }
-
   @override
   void dispose() {
-    // TODO: implement dispose
     animationcontroller!.dispose();
     pageController!.dispose();
-    audioPlayer.release();
-    audioPlayer.dispose();
-    audioCache!.clearAll();
+
     super.dispose();
   }
 
-  playMusic(String path) async {
-    audioPlayer.play(DeviceFileSource(path));
-  }
+  playMusic(String path) async {}
 
-  pauseMusic() async {
-    await audioPlayer.pause();
-  }
+  pauseMusic() async {}
 
   int i = 0;
   void nextPage() {
@@ -306,7 +248,6 @@ class _QuizAnswerState extends State<QuizTest> with TickerProviderStateMixin {
                                             setState(() {
                                               nbretrouves = nbretrouves + 1;
                                             });
-                                            await playMusic(path1);
                                             showModalBottomSheet<void>(
                                                 context: context,
                                                 isDismissible: false,
@@ -351,7 +292,6 @@ class _QuizAnswerState extends State<QuizTest> with TickerProviderStateMixin {
                                                   );
                                                 });
                                           } else {
-                                            await playMusic(path2);
                                             showModalBottomSheet<void>(
                                                 context: context,
                                                 isDismissible: false,

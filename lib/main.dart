@@ -1,9 +1,18 @@
 import 'package:LASYLAB/core/size_config.dart';
+import 'package:LASYLAB/feature/authentication/logic/bloc/user/user_bloc.dart';
+import 'package:LASYLAB/feature/chat/logic/bloc/bloc/chat_bloc.dart';
+import 'package:LASYLAB/feature/chat/logic/cubit/message/message_cubit.dart';
+import 'package:LASYLAB/feature/chat/repository/chat_repository.dart';
+import 'package:LASYLAB/feature/chat/repository/user_repository.dart';
+import 'package:LASYLAB/firebase_options.dart';
 import 'package:LASYLAB/routes.dart';
 import 'package:LASYLAB/services/database_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:get_storage/get_storage.dart';
 
 import 'core/components/styling.dart';
@@ -15,6 +24,10 @@ void main() async {
   await Firebase.initializeApp();
   await GetStorage.init();
   await initDi();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  FirebaseFirestore.instance.settings = const Settings(
+    persistenceEnabled: true,
+  );
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
@@ -23,6 +36,7 @@ void main() async {
       statusBarIconBrightness: Brightness.dark,
     ),
   );
+
   runApp(MyApp(initialRoute: "/"));
 }
 
@@ -35,12 +49,30 @@ class MyApp extends StatelessWidget {
       builder: (context, constraints) => OrientationBuilder(
         builder: (context, orientation) {
           SizeConfig().init(constraints, orientation);
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: "LASYLAB",
-            theme: AppTheme.lightTheme,
-            initialRoute: getRoutes(), // initialRoute,
-            routes: routes,
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (context) => UserBloc(
+                  userRepository: GetIt.instance<UserRepository>(),
+                ),
+              ),
+              BlocProvider(
+                create: (context) =>
+                    ChatBloc(chatRepository: GetIt.instance<ChatRepository>()),
+              ),
+              BlocProvider(
+                create: (context) => MessageCubit(
+                  chatRepository: GetIt.instance<ChatRepository>(),
+                ),
+              ),
+            ],
+            child: MaterialApp(
+              debugShowCheckedModeBanner: false,
+              title: "LASYLAB",
+              theme: AppTheme.lightTheme,
+              initialRoute: getRoutes(), // initialRoute,
+              routes: routes,
+            ),
           );
         },
       ),

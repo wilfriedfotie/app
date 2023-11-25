@@ -26,7 +26,6 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     _selectedIndex = widget.defaultSelectedIndex;
@@ -35,9 +34,53 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      ..._iconList.map((e) => buildNavBarItem(item: e)).toList(),
-    ]);
+    return BottomNavigationBar(
+        showUnselectedLabels: false,
+        showSelectedLabels: false,
+        selectedFontSize: 0,
+        unselectedFontSize: 0,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+          widget.pageController.animateToPage(index,
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.easeOutQuad);
+          _iconList[index].onSelected();
+        },
+        items: _iconList
+            .map((e) => BottomNavigationBarItem(
+                  label: "",
+                  icon: AnimatedContainer(
+                    duration: Duration(milliseconds: 200),
+                    width: double.infinity,
+                    decoration: e.id == _selectedIndex
+                        ? BoxDecoration(
+                            border: Border(
+                              top: BorderSide(
+                                  width: 4, color: AppTheme.primaryColor),
+                            ),
+                          )
+                        : null,
+                    child: e.svg != null && e.svg != ""
+                        ? Container(
+                            padding: const EdgeInsets.all(8.0),
+                            child: SvgPicture.asset(
+                              e.svg ?? "",
+                              color: e.id == _selectedIndex
+                                  ? AppTheme.primaryColor
+                                  : AppTheme.grayColor,
+                            ),
+                          )
+                        : Icon(
+                            e.icon,
+                            color: e.id == _selectedIndex
+                                ? AppTheme.primaryColor
+                                : AppTheme.grayColor,
+                          ),
+                  ),
+                ))
+            .toList());
   }
 
   Widget buildNavBarItem({required NavBarItem item}) {
@@ -65,7 +108,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
               )
             : BoxDecoration(),
         child: item.svg != null && item.svg != ""
-            ? Padding(
+            ? Container(
                 padding: const EdgeInsets.all(8.0),
                 child: SvgPicture.asset(
                   item.svg ?? "",

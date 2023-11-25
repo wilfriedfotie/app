@@ -50,5 +50,11 @@
         <key>NSAllowsLocalNetworking</key>
         <true/>
     </dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Explain why your app needs access to the camera for image capture.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Explain why your app needs access to the camera for image capture.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We need to access to the microphone to record audio file</string>
 </dict>
 </plist>

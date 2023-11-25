@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import '../feature/chat/presentation/pages/chat_page.dart';
 
 class Menu extends StatefulWidget {
+  static const routeName = "/menu";
   const Menu({Key? key}) : super(key: key);
 
   @override
