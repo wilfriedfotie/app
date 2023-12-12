@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-// import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
 
 class AudioRecordingService {
@@ -16,8 +15,7 @@ class AudioRecordingService {
   }
 
   Future<void> _requestPermissions() async {
-    // await Permission.microphone.request();
-    // await Permission.manageExternalStorage.request();
+
   }
 
   Future<String?> startRecording() async {

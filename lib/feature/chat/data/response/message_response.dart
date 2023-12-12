@@ -9,6 +9,7 @@ class MessageResponse {
   final String? image;
   final bool? isAnswer;
   final String? responseId;
+  final String? sender;
   final DateTime? date;
   final MessageResponseType type;
 
@@ -17,6 +18,7 @@ class MessageResponse {
     this.message,
     this.image,
     this.isAnswer,
+    this.sender,
     this.responseId,
     this.date,
     required this.type,
@@ -26,6 +28,7 @@ class MessageResponse {
     String? id,
     String? message,
     String? image,
+    String? sender,
     bool? isAnswer,
     String? responseId,
     DateTime? date,
@@ -34,6 +37,7 @@ class MessageResponse {
     return MessageResponse(
       id: id ?? this.id,
       message: message ?? this.message,
+      sender: sender ?? this.sender,
       image: image ?? this.image,
       isAnswer: isAnswer ?? this.isAnswer,
       responseId: responseId ?? this.responseId,
@@ -46,6 +50,7 @@ class MessageResponse {
     return <String, dynamic>{
       'id': id,
       'message': message,
+      'sender': sender,
       'image': image,
       'isAnswer': isAnswer,
       'responseId': responseId,
@@ -58,12 +63,13 @@ class MessageResponse {
     return MessageResponse(
       id: map['id'],
       message: map['message'] != null ? map['message'] as String : null,
+      sender: map['sender'] != null ? map['sender'] as String : null,
       image: map['image'] != null ? map['image'] as String : null,
       isAnswer: map['isAnswer'] != null ? map['isAnswer'] as bool : null,
       responseId:
           map['responseId'] != null ? map['responseId'] as String : null,
-      date: map['date'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['date'] as int)
+      date: map['createdAt'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int)
           : null,
       type: MessageResponseType.values
           .firstWhere((element) => element.name == map['type']),

@@ -37,11 +37,10 @@ class _GetImageState extends State<GetImage> {
             title: Text('Camera', style: Theme.of(context).textTheme.bodyLarge),
             onTap: () async {
               final File? image =
-                  await _imagePickerService.pickImageFromGallery();
+                  await _imagePickerService.pickImageFromCamera();
 
-              image != null
-                  ? Navigator.of(context).pop(File(image.path))
-                  : Navigator.of(context).pop();
+              Navigator.of(context)
+                  .pop(image != null ? File(image.path) : null);
             },
           ),
         ],

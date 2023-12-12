@@ -84,11 +84,11 @@ class _MessageWidgetState extends State<MessageWidget>
                 right: 16.0,
               ),
               child: Text(
-                "Envoyé à ${date.hour}h ${date.minute}",
+                "${date.day}/${date.month}/${date.year} à ${date.hour}h ${date.minute}",
                 style: GoogleFonts.poppins(
                   color: HexColor("#AFAFAF"),
                   textStyle: TextStyle(
-                    fontSize: 12,
+                    fontSize: 8,
                     fontWeight: FontWeight.normal,
                   ),
                 ),

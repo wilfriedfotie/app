@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:LASYLAB/core/components/styling.dart';
 import 'package:LASYLAB/core/size_config.dart';
+import 'package:LASYLAB/feature/authentication/logic/bloc/user/user_bloc.dart';
 import 'package:LASYLAB/feature/chat/data/request/chat_fetch_params.dart';
 import 'package:LASYLAB/feature/chat/data/response/message_response.dart';
 import 'package:LASYLAB/feature/chat/logic/bloc/bloc/chat_bloc.dart';
@@ -9,10 +12,11 @@ import 'package:LASYLAB/feature/chat/data/response/group_response.dart';
 import 'package:LASYLAB/feature/chat/data/response/user_response.dart';
 import 'package:LASYLAB/feature/chat/presentation/widget/image_choose_widget.dart';
 import 'package:LASYLAB/feature/chat/provider/chat_provider.dart';
+import 'package:LASYLAB/feature/chat/service/audio_recording_service.dart';
 import 'package:LASYLAB/forms/message_widget.dart';
 import 'package:LASYLAB/models/message.dart';
 import 'package:LASYLAB/models/user.dart';
-import 'package:LASYLAB/services/image_service.dart';
+import 'package:LASYLAB/services/permission_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,6 +24,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:image_picker/image_picker.dart';
 
 class DiscussionPage extends StatefulWidget {
   static const routeName = "/discussions";
@@ -35,11 +40,14 @@ class _DiscussionPageState extends State<DiscussionPage>
   ScrollController _scrollController = ScrollController();
   final _controller = TextEditingController();
   String message = '';
-  String imageUrl = '';
+  File? _image;
   bool _loading = false, _hasMore = false;
   int nbre = 20;
   DocumentSnapshot? lastDocument;
-
+  late AudioRecordingService _audioRecordingService =
+      GetIt.instance<AudioRecordingService>();
+  late PermissionHandlerService _permissions =
+      GetIt.instance<PermissionHandlerService>();
   @override
   void initState() {
     super.initState();
@@ -234,26 +242,34 @@ class _DiscussionPageState extends State<DiscussionPage>
                           reverse: true,
                           scrollDirection: Axis.vertical,
                           children: [
-                            ...snapshot.data!.map((e) => MessageWidget(
-                                    message: Message(
-                                  createdAt: e.date ?? DateTime.now(),
-                                  receiverUid: "fneojbfih",
-                                  senderUid: "cdjlzjbihd",
-                                  type: "texte",
-                                  uid: "uisdbnjsdnks",
-                                  isMe: true,
-                                  content: e.message,
-                                ))),
+                            ...snapshot.data!.map((e) => Column(
+                                  children: [
+                                    MessageWidget(
+                                        message: Message(
+                                      createdAt: e.date ?? DateTime.now(),
+                                      receiverUid: "fneojbfih",
+                                      senderUid: "cdjlzjbihd",
+                                      type: "texte",
+                                      uid: "uisdbnjsdnks",
+                                      isMe: (context.read<UserBloc>().state
+                                                  as UserSuccess)
+                                              .data
+                                              .id ==
+                                          e.sender,
+                                      content: e.message,
+                                    )),
+                                  ],
+                                )),
                             if (_hasMore)
-                              Padding(
+                              Container(
                                 padding: const EdgeInsets.all(8.0),
                                 child:
-                                    Center(child: CircularProgressIndicator()),
+                                    Center(child: CircularProgressIndicator(strokeWidth: 2,)),
                               ),
                           ]);
                     }
                     if (snapshot.hasError) {
-                      return Text(snapshot.error.toString());
+                      return Container();
                     }
                     return Center(
                       child: CircularProgressIndicator(),
@@ -262,154 +278,142 @@ class _DiscussionPageState extends State<DiscussionPage>
           //body end
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 18),
-            child: Row(
+            child: Column(
               children: [
-                Expanded(
-                  child: TextFormField(
-                      maxLines: 7,
-                      keyboardType: TextInputType.multiline,
-                      minLines: 1,
-                      controller: _controller,
-                      autocorrect: true,
-                      textCapitalization: TextCapitalization.sentences,
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(
-                            horizontal: screenSize.width * .05),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30.0),
-                            borderSide: BorderSide(
-                              color: AppTheme.grayColor,
-                            )),
-                        focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30.0),
-                            borderSide: BorderSide(
-                              color: AppTheme.grayColor,
-                            )),
-                        filled: true,
-                        hintStyle: TextStyle(
-                            color: AppTheme.grayColor,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 14),
-                        hintText: "Message",
-                        fillColor: Color(0xffF7F7F7),
-                        suffixIcon: GestureDetector(
-                          onTap: () async {
-                            // await getImage();
-                          },
-                          child: IconButton(
-                              onPressed: () async {
-                                final result = await showModalBottomSheet(
-                                    context: context,
-                                    builder: (BuildContext bc) {
-                                      return const GetImage(rad: true);
-                                    });
-                              },
-                              icon: Icon(
-                                Icons.image,
-                                color: Colors.black, // HexColor("#AFAFAF"),
-                              )),
-                        ),
-                      )),
+                if(_image is File) Stack(
+                  children: [
+                    Image.file(_image!, height: 200,),
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      child: IconButton(onPressed: (){
+                        setState(() {
+                          _image = null;
+                        });
+                      }, icon: Container(
+                          padding: EdgeInsets.all(6),
+                          decoration: BoxDecoration(color: Theme.of(context).colorScheme.background, shape: BoxShape.circle),
+                          child: Icon(Icons.close))),
+                    )
+                  ],
                 ),
-                // Expanded(
-                //   child: Container(
-                //     child: TextField(
-                //       controller: _controller,
-                //       autocorrect: true,
-                //       maxLines: 1,
-                //       textCapitalization: TextCapitalization.sentences,
-                //       decoration: InputDecoration(
-                //         contentPadding: EdgeInsets.symmetric(
-                //             horizontal: screenSize.width * .05),
-                //         border: OutlineInputBorder(
-                //             borderRadius: BorderRadius.circular(30.0),
-                //             borderSide: BorderSide(
-                //               color: AppTheme.grayColor,
-                //             )),
-                //         focusedBorder: OutlineInputBorder(
-                //             borderRadius: BorderRadius.circular(30.0),
-                //             borderSide: BorderSide(
-                //               color: AppTheme.grayColor,
-                //             )),
-                //         filled: true,
-                //         hintStyle: TextStyle(
-                //             color: AppTheme.grayColor,
-                //             fontWeight: FontWeight.w700,
-                //             fontSize: 14),
-                //         hintText: "Message",
-                //         fillColor: Color(0xffF7F7F7),
-                //         suffixIcon: GestureDetector(
-                //           onTap: () async {
-                //             // await getImage();
-                //           },
-                //           child: Icon(
-                //             Icons.image,
-                //             color: Colors.black, // HexColor("#AFAFAF"),
-                //           ),
-                //         ),
-                //       ),
-                //     ),
-                //   ),
-                // ),
-
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: InkWell(
-                    onTap: () async {
-                      if (_controller.text.isNotEmpty) {
-                        // response
-
-                        context.read<MessageCubit>().sendMessage(MessageRequest(
-                            message: _controller.text.trim(),
-                            createdAt: DateTime.now(),
-                            type: MessageResponseType.text,
-                            isAnswer: false,
-                            sender: UserResponse(
-                                id: response.initiator.id, name: "Wilfried"),
-                            chat: response));
-                      }
-                    },
-                    child: Container(
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Color(0xffF7F7F7),
-                          border: Border.all(
-                            color: AppTheme.grayColor,
-                          )),
-                      alignment: Alignment.center,
-                      child: BlocConsumer<MessageCubit, MessageState>(
-                        listener: (context, state) {
-                          if (state is SendMessageFailed) {
-                            _controller.clear();
-                          }
-                        },
-                        builder: (context, state) {
-                          if (state is SendMessageLoading) {
-                            return Container(
-                              alignment: Alignment.center,
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                              ),
-                            );
-                          }
-                          return ValueListenableBuilder(
-                              valueListenable: _controller,
-                              builder: (context, val, __) {
-                                return Icon(
-                                  val.text.trim().isEmpty
-                                      ? Icons.mic_none
-                                      : Icons.send,
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                          maxLines: 7,
+                          keyboardType: TextInputType.multiline,
+                          minLines: 1,
+                          controller: _controller,
+                          autocorrect: true,
+                          textCapitalization: TextCapitalization.sentences,
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(
+                                horizontal: screenSize.width * .05),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                                borderSide: BorderSide(
                                   color: AppTheme.grayColor,
-                                  size: 24,
-                                );
-                              });
+                                )),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                                borderSide: BorderSide(
+                                  color: AppTheme.grayColor,
+                                )),
+                            filled: true,
+                            hintStyle: TextStyle(
+                                color: AppTheme.grayColor,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14),
+                            hintText: "Message",
+                            fillColor: Color(0xffF7F7F7),
+                            suffixIcon: GestureDetector(
+                              onTap: () async {
+                                // await getImage();
+                              },
+                              child: IconButton(
+                                  onPressed: () async {
+                                    final result = await showModalBottomSheet(
+                                        context: context,
+                                        builder: (BuildContext bc) {
+                                          return const GetImage(rad: true);
+                                        });
+
+                                    setState(() {
+                                      _image = result;
+                                    });
+                                  },
+                                  icon: Icon(
+                                    Icons.image,
+                                    color: Colors.black, // HexColor("#AFAFAF"),
+                                  )),
+                            ),
+                          )),
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: InkWell(
+                        onTap: () async {
+                          if (_controller.text.isNotEmpty) {
+                            // response
+
+                            context.read<MessageCubit>().sendMessage(MessageRequest(
+                                message: _controller.text.trim(),
+                                createdAt: DateTime.now(),
+                                type: MessageResponseType.text,
+                                isAnswer: false,
+                                sender: UserResponse(
+                                    id: response.initiator.id, name: "Wilfried"),
+                                chat: response));
+                          } else {
+
+                            await _audioRecordingService.startRecording();
+                          }
                         },
+                        child: Container(
+                          padding: EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Color(0xffF7F7F7),
+                              border: Border.all(
+                                color: AppTheme.grayColor,
+                              )),
+                          alignment: Alignment.center,
+                          child: BlocConsumer<MessageCubit, MessageState>(
+                            listener: (context, state) {
+                              if (state is SendMessageLoading) {
+                                _controller.clear();
+                              }
+                            },
+                            builder: (context, state) {
+                              // if (state is SendMessageLoading) {
+                              //   return Container(
+                              //     alignment: Alignment.center,
+                              //     height: 20,
+                              //     width: 20,
+                              //     child: CircularProgressIndicator(
+                              //       strokeWidth: 2,
+                              //     ),
+                              //   );
+                              // }
+                              return ValueListenableBuilder(
+                                  valueListenable: _controller,
+                                  builder: (context, val, __) {
+                                    return Icon(
+                                      val.text.trim().isEmpty && _image is! File
+                                          ? Icons.mic_none
+                                          : Icons.send,
+                                      color: AppTheme.grayColor,
+                                      size: 24,
+                                    );
+                                  });
+                            },
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ],
             ),

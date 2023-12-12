@@ -2,11 +2,13 @@ import 'package:LASYLAB/components/fancy_button.dart';
 import 'package:LASYLAB/core/components/images.dart';
 import 'package:LASYLAB/core/components/styling.dart';
 import 'package:LASYLAB/core/size_config.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:LASYLAB/feature/courses/data/mocks/fake_subjects_quiz.dart';
+import 'package:LASYLAB/feature/courses/presentation/widgets/video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class VideoCourseReading extends StatefulWidget {
+  static const routeName = "/course_status";
   const VideoCourseReading({Key? key}) : super(key: key);
 
   @override
@@ -18,6 +20,7 @@ class _VideoCourseReadingState extends State<VideoCourseReading>
   late AnimationController _animationController;
   late Animation _colorTween;
   bool isVideoReading = true;
+  final topic = fakeSubjectQuizzes;
 
   @override
   void initState() {
@@ -65,7 +68,7 @@ class _VideoCourseReadingState extends State<VideoCourseReading>
           ),
         ),
         centerTitle: true,
-        title: isVideoReading
+        title: !isVideoReading
             ? Container(
                 margin: EdgeInsets.symmetric(vertical: 20),
                 width: screenSize.width,
@@ -108,10 +111,11 @@ class _VideoCourseReadingState extends State<VideoCourseReading>
               child: Stack(
                 children: [
                   Container(
-                      height: screenSize.height - appBar.preferredSize.height,
-                      alignment: Alignment.center,
-
-                      color: AppTheme.blueColor),
+                    height: screenSize.height - appBar.preferredSize.height,
+                    alignment: Alignment.center,
+                    color: AppTheme.blueColor,
+                    child: VideoApp(link: topic[1].video!),
+                  ),
                   Positioned(
                     bottom: dimensH(0),
                     left: screenSize.width * .4,
@@ -145,7 +149,7 @@ class _VideoCourseReadingState extends State<VideoCourseReading>
                               height: dimensH(screenSize.height * .02,
                                   sm: screenSize.height * .01),
                             ),
-                            Text("Cours",
+                            Text("QCM",
                                 style: TextStyle(
                                     fontSize: dimensH(
                                         2.5 * SizeConfig.textMultiplier,
@@ -165,8 +169,9 @@ class _VideoCourseReadingState extends State<VideoCourseReading>
                           print("download the course");
                         },
                         child: Container(
-                          height: dimensH(screenSize.height * .15),
-                          width: dimensW(screenSize.width * .25),
+                          height: 50,
+                          width: 50,
+                          margin: EdgeInsets.only(left: 8, bottom: 8),
                           padding: EdgeInsets.symmetric(
                               vertical: dimensH(10, sm: 7)),
                           alignment: Alignment.center,
@@ -217,14 +222,44 @@ class _VideoCourseReadingState extends State<VideoCourseReading>
                         },
                         child: ListView(
                           children: [
-                            RichText(
-                              text: TextSpan(
-                                text:
-                                    "Etapes à suivre pour factoriser un polynôme",
-                                style: TextStyle(
-                                    color: AppTheme.blueColor, fontSize: 18),
+                            Center(
+                              child: Text(
+                                topic[2].quizs.first.title,
+                                style: Theme.of(context).textTheme.bodyLarge,
                               ),
-                            )
+                            ),
+                            Padding(
+                                padding: EdgeInsets.all(20),
+                                child: Column(
+                                    children: topic[2]
+                                        .quizs[2]
+                                        .proposition
+                                        .map((e) => Container(
+                                              width: double.infinity,
+                                              margin:
+                                                  const EdgeInsets.only(top: 8),
+                                              padding: const EdgeInsets.only(
+                                                  right: 8.0, top: 8),
+                                              child: FancyButton(
+                                                size: 18,
+                                                duration: const Duration(
+                                                    milliseconds: 160),
+                                                onPressed: () {
+                                                  setState(() {});
+                                                },
+                                                child: Center(
+                                                    child: Text(
+                                                  e,
+                                                  textAlign: TextAlign.center,
+                                                  style:
+                                                      TextStyle(fontSize: 22),
+                                                )),
+                                                color: false
+                                                    ? AppTheme.secondaryLightBg
+                                                    : AppTheme.whiteColor,
+                                              ),
+                                            ))
+                                        .toList()))
                           ],
                         ),
                       ),

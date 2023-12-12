@@ -51,9 +51,11 @@
         <true/>
     </dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Explain why your app needs access to the camera for image capture.</string>
-	<key>NSCameraUsageDescription</key>
-	<string>Explain why your app needs access to the camera for image capture.</string>
+	<string>Access to the camera allows you to take photos for your messages.</string>
+
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Allow photo access to add photos to your for your messages.</string>
+
 	<key>NSMicrophoneUsageDescription</key>
 	<string>We need to access to the microphone to record audio file</string>
 </dict>

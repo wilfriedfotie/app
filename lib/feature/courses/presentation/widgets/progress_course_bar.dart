@@ -1,6 +1,7 @@
 import 'package:LASYLAB/core/components/images.dart';
 import 'package:LASYLAB/core/components/styling.dart';
 import 'package:LASYLAB/core/size_config.dart';
+import 'package:LASYLAB/feature/courses/presentation/page/video_course_reading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -41,7 +42,7 @@ class _ProgressCourseBarState extends State<ProgressCourseBar> {
           child: Material(
             child: InkWell(
               onTap: () {
-                Navigator.of(context).pushNamed("/course_status");
+                Navigator.of(context).pushNamed(VideoCourseReading.routeName);
               },
               highlightColor: AppTheme.textBlueColor.withOpacity(.5),
               splashColor: AppTheme.primaryColor.withOpacity(.5),

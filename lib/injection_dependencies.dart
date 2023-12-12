@@ -3,6 +3,8 @@ import 'package:LASYLAB/feature/chat/provider/user_provider.dart';
 import 'package:LASYLAB/feature/chat/repository/chat_repository.dart';
 import 'package:LASYLAB/feature/chat/repository/user_repository.dart';
 import 'package:LASYLAB/feature/chat/service/audio_recording_service.dart';
+import 'package:LASYLAB/services/image_service.dart';
+import 'package:LASYLAB/services/permission_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
@@ -26,9 +28,15 @@ Future<void> initDi() async {
   sl.registerLazySingleton(() => storage);
   sl.registerLazySingleton(() => DioWrapper.getInstance());
   sl.registerLazySingleton<ChatProvider>(() => _chatProvider);
+  sl.registerLazySingleton<PermissionHandlerService>(
+      () => PermissionHandlerService());
+
   sl.registerLazySingleton<ChatRepository>(
       () => ChatRepository(chatProvider: _chatProvider));
   sl.registerLazySingleton<UserRepository>(
       () => UserRepository(userProvider: _userProvider));
-  sl.registerLazySingleton(() => AudioRecordingService());
+  sl.registerLazySingleton<AudioRecordingService>(
+      () => AudioRecordingService());
+
+  sl.registerLazySingleton<ImagePickerService>(() => ImagePickerService());
 }
