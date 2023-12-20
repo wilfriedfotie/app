@@ -313,11 +313,14 @@ class _DiscussionPageState extends State<DiscussionPage>
                       )
                     ],
                   ),
-                Row(
-                  children: [
-                    _isVoiceRecorde
-                        ? Container()
-                        : Expanded(
+                !_isVoiceRecorde
+                    ? Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: TestRecorder(),
+                      )
+                    : Row(
+                        children: [
+                          Expanded(
                             child: TextFormField(
                                 maxLines: 7,
                                 keyboardType: TextInputType.multiline,
@@ -372,97 +375,99 @@ class _DiscussionPageState extends State<DiscussionPage>
                                   ),
                                 )),
                           ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: InkWell(
-                        onTap: () async {
-                          if (_controller.text.isNotEmpty) {
-                            // response
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: InkWell(
+                              onTap: () async {
+                                if (_controller.text.isNotEmpty) {
+                                  // response
 
-                            context.read<MessageCubit>().sendMessage(
-                                MessageRequest(
-                                    message: _controller.text.trim(),
-                                    createdAt: DateTime.now(),
-                                    type: MessageResponseType.text,
-                                    isAnswer: false,
-                                    sender: UserResponse(
-                                        id: response.initiator.id,
-                                        name: "Wilfried"),
-                                    chat: response));
-                          } else {
-                            if (showPlayer) {
-                              _audioRecordingService
-                                  .stopRecording()
-                                  .then((value) {
-                                setState(() {
-                                  showPlayer = !showPlayer;
-                                });
-                              });
-                              return;
-                            }
-                            await _audioRecordingService.requestPermissions();
-                            _audioRecordingService
-                                .startRecording()
-                                .then((value) {
-                              setState(() {
-                                showPlayer = !showPlayer;
-                              });
-                            });
-                          }
-                        },
-                        child: Container(
-                          width: _isVoiceRecorde
-                              ? MediaQuery.of(context).size.width / 1.2
-                              : null,
-                          padding: EdgeInsets.all(8),
-                          decoration: _isVoiceRecorde
-                              ? BoxDecoration()
-                              : BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Color(0xffF7F7F7),
-                                  border: Border.all(
-                                    color: AppTheme.grayColor,
-                                  )),
-                          alignment: Alignment.center,
-                          child: BlocConsumer<MessageCubit, MessageState>(
-                            listener: (context, state) {
-                              if (state is SendMessageLoading) {
-                                _controller.clear();
-                              }
-                            },
-                            builder: (context, state) {
-                              // if (state is SendMessageLoading) {
-                              //   return Container(
-                              //     alignment: Alignment.center,
-                              //     height: 20,
-                              //     width: 20,
-                              //     child: CircularProgressIndicator(
-                              //       strokeWidth: 2,
-                              //     ),
-                              //   );
-                              // }
-                              return ValueListenableBuilder(
-                                  valueListenable: _controller,
-                                  builder: (context, val, __) {
-                                    if (val.text.trim().isEmpty &&
-                                        _image is! File) {
-                                      return TestRecorder();
-                                    }
-                                    return Icon(
-                                      val.text.trim().isEmpty && _image is! File
-                                          ? Icons.mic_none
-                                          : Icons.send,
-                                      color: AppTheme.grayColor,
-                                      size: 24,
-                                    );
+                                  context.read<MessageCubit>().sendMessage(
+                                      MessageRequest(
+                                          message: _controller.text.trim(),
+                                          createdAt: DateTime.now(),
+                                          type: MessageResponseType.text,
+                                          isAnswer: false,
+                                          sender: UserResponse(
+                                              id: response.initiator.id,
+                                              name: "Wilfried"),
+                                          chat: response));
+                                } else {
+                                  if (showPlayer) {
+                                    _audioRecordingService
+                                        .stopRecording()
+                                        .then((value) {
+                                      setState(() {
+                                        showPlayer = !showPlayer;
+                                      });
+                                    });
+                                    return;
+                                  }
+                                  await _audioRecordingService
+                                      .requestPermissions();
+                                  _audioRecordingService
+                                      .startRecording()
+                                      .then((value) {
+                                    setState(() {
+                                      showPlayer = !showPlayer;
+                                    });
                                   });
-                            },
+                                }
+                              },
+                              child: Container(
+                                width: _isVoiceRecorde
+                                    ? MediaQuery.of(context).size.width / 1.2
+                                    : null,
+                                padding: EdgeInsets.all(8),
+                                decoration: _isVoiceRecorde
+                                    ? BoxDecoration()
+                                    : BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Color(0xffF7F7F7),
+                                        border: Border.all(
+                                          color: AppTheme.grayColor,
+                                        )),
+                                alignment: Alignment.center,
+                                child: BlocConsumer<MessageCubit, MessageState>(
+                                  listener: (context, state) {
+                                    if (state is SendMessageLoading) {
+                                      _controller.clear();
+                                    }
+                                  },
+                                  builder: (context, state) {
+                                    // if (state is SendMessageLoading) {
+                                    //   return Container(
+                                    //     alignment: Alignment.center,
+                                    //     height: 20,
+                                    //     width: 20,
+                                    //     child: CircularProgressIndicator(
+                                    //       strokeWidth: 2,
+                                    //     ),
+                                    //   );
+                                    // }
+                                    return ValueListenableBuilder(
+                                        valueListenable: _controller,
+                                        builder: (context, val, __) {
+                                          if (val.text.trim().isEmpty &&
+                                              _image is! File) {
+                                            return TestRecorder();
+                                          }
+                                          return Icon(
+                                            val.text.trim().isEmpty &&
+                                                    _image is! File
+                                                ? Icons.mic_none
+                                                : Icons.send,
+                                            color: AppTheme.grayColor,
+                                            size: 24,
+                                          );
+                                        });
+                                  },
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
               ],
             ),
           ),
