@@ -14,8 +14,7 @@ class _CourseReadingState extends State<CourseReading> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    return SafeArea(
-        child: Scaffold(
+    return Scaffold(
       backgroundColor: AppTheme.scaffoldBgColor,
       appBar: AppBar(
         backgroundColor: AppTheme.scaffoldBgColor,
@@ -60,6 +59,39 @@ class _CourseReadingState extends State<CourseReading> {
                     style: TextStyle(color: AppTheme.blueColor, fontSize: 18),
                   ),
                 ),
+                SizedBox(height: 42.0),
+
+                Text(
+                  'Étapes à suivre pour factoriser un polynôme :',
+                  style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 12.0),
+                Text(
+                  'Cas : binôme',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8.0),
+                Text(
+                  'Lorsque l\'expression à factoriser est un binôme, voici les étapes recommandées :',
+                  style: TextStyle(fontSize: 16.0),
+                ),
+                SizedBox(height: 8.0),
+                Text(
+                  '1. Effectuer une mise en évidence simple, si c\'est possible.',
+                  style: TextStyle(fontSize: 16.0),
+                ),
+                SizedBox(height: 8.0),
+                Text(
+                  '2. Si le signe entre les deux termes du binôme est une soustraction, vérifier s\'il est possible de faire une différence de carrés.',
+                  style: TextStyle(fontSize: 16.0),
+                ),
+                // Ajoutez d'autre
               ],
             ),
           ),
@@ -93,6 +125,6 @@ class _CourseReadingState extends State<CourseReading> {
           )
         ],
       ),
-    ));
+    );
   }
 }

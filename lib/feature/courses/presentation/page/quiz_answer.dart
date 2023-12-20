@@ -1,355 +1,263 @@
 import 'package:LASYLAB/components/fancy_button.dart';
 import 'package:LASYLAB/components/quizdialog.dart';
 import 'package:LASYLAB/core/components/styling.dart';
-import 'package:LASYLAB/feature/courses/presentation/widgets/quiz_answer_widget.dart';
-import 'package:LASYLAB/models/question.dart';
 import 'package:LASYLAB/views/congratulation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:logger/logger.dart' as TheLogger;
+import 'package:LASYLAB/core/size_config.dart';
+import 'package:LASYLAB/feature/courses/data/mocks/fake_subjects_quiz.dart';
+import 'package:audioplayers/audioplayers.dart';
+import '../../data/models/response/quiz_response.dart';
 
-class QuizTest extends StatefulWidget {
-  const QuizTest({Key? key}) : super(key: key);
+class QuizTestWidget extends StatefulWidget {
+  static const routeName = "/quiz_test_widget";
+  const QuizTestWidget({Key? key}) : super(key: key);
 
   @override
-  _QuizAnswerState createState() => _QuizAnswerState();
+  _QuizTestWidgetState createState() => _QuizTestWidgetState();
 }
 
-class _QuizAnswerState extends State<QuizTest> with TickerProviderStateMixin {
-  AnimationController? animationcontroller;
-  List<Question>? quest = [];
-  String selectedUserResponse = "";
-  PageController? pageController;
-  int indexpage = 0;
-  int nbretrouves = 0;
-  double ratio = 0;
+class _QuizTestWidgetState extends State<QuizTestWidget>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  final topic = fakeSubjectQuizzes;
+  final _audioPlayer = AudioPlayer()..setReleaseMode(ReleaseMode.stop);
+  int nbretrouves = 0, currentSelected = 0;
 
   @override
-  void dispose() {
-    animationcontroller!.dispose();
-    pageController!.dispose();
-
-    super.dispose();
+  void initState() {
+    _animationController =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 999));
+    changeColors();
+    super.initState();
   }
 
-  playMusic(String path) async {}
-
-  pauseMusic() async {}
-
-  int i = 0;
-  void nextPage() {
-    setState(() {
-      i++;
-      selectedUserResponse = "";
-      ratio = i / quest!.length;
-      TheLogger.Logger().d(ratio);
-    });
-
-    pageController!.animateToPage(pageController!.page!.toInt() + 1,
-        duration: Duration(milliseconds: 400), curve: Curves.easeIn);
+  Future changeColors() async {
+    while (true) {
+      await Future.delayed(const Duration(seconds: 1), () {
+        if (_animationController.status == AnimationStatus.completed) {
+          _animationController.reverse();
+        } else {
+          _animationController.forward();
+        }
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    var screenSize = MediaQuery.of(context).size;
-    return SafeArea(
-      child: Scaffold(
+    final screenSize = MediaQuery.of(context).size;
+    AppBar appBar = AppBar(
         backgroundColor: AppTheme.scaffoldBgColor,
-        appBar: AppBar(
-          backgroundColor: AppTheme.scaffoldBgColor,
-          elevation: 0,
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(
-              Icons.close,
-              color: AppTheme.borderColor,
-              size: 35,
-            ),
-          ),
-          title: Container(
-            margin: EdgeInsets.symmetric(vertical: 20),
-            width: screenSize.width,
-            height: 9,
-            child: ClipRRect(
-              borderRadius: BorderRadius.all(
-                Radius.circular(10),
-              ),
-              child: LinearProgressIndicator(
-                value: ratio,
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  HexColor("#58CC02"),
-                ),
-                backgroundColor: HexColor("#E5E5E5"),
-              ),
-            ),
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(
+            Icons.close,
+            color: AppTheme.borderColor,
+            size: 35,
           ),
         ),
-        body: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: quest != null && quest!.length != 0
-                ? Expanded(
-                    child: Container(
-                      height: screenSize.height * .7,
-                      decoration: BoxDecoration(
-                          color: AppTheme.whiteColor,
-                          borderRadius: BorderRadius.circular(21)),
-                      child: PageView.builder(
-                          scrollDirection: Axis.horizontal,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: quest!.length,
-                          allowImplicitScrolling: false,
-                          pageSnapping: false,
-                          controller: pageController,
-                          onPageChanged: (page) {
-                            setState(() {
-                              indexpage = page + 1;
-                            });
-                          },
-                          itemBuilder: (context, index) {
-                            var q = quest![index];
-                            return Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: screenSize.width * .05),
-                              child: new ListView(
-                                children: [
-                                  SizedBox(
-                                    height: screenSize.height * .05,
-                                  ),
-                                  Text(
-                                    "${q.texte}",
-                                    textAlign: TextAlign.center,
-                                    softWrap: true,
-                                    style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppTheme.textBlackV2Color,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: screenSize.height * .15,
-                                  ),
-                                  ...q.reponses!
-                                      .map(
-                                        (e) => Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: InkWell(
-                                              onTap: () {
-                                                setState(() {
-                                                  selectedUserResponse = e.id!;
-                                                });
-                                              },
-                                              child: QuizTestAnswer(
-                                                  screenSize: screenSize,
-                                                  title: e.texte ?? "",
-                                                  selectedUserResponse:
-                                                      selectedUserResponse,
-                                                  id: e.id ?? ""),
-                                            )
-                                            // SizedBox(
-                                            //   height: 30,
-                                            //   child: OutlinedButton(
-                                            //     child: Row(
-                                            //       children: [
-                                            //         Padding(
-                                            //           padding: const EdgeInsets
-                                            //                   .symmetric(
-                                            //               horizontal: 10),
-                                            //           child: Text(
-                                            //             "${e.etiquette} ) ",
-                                            //             textAlign:
-                                            //                 TextAlign.justify,
-                                            //             style:
-                                            //                 GoogleFonts.openSans(
-                                            //               color: Colors.black,
-                                            //               textStyle: TextStyle(
-                                            //                 fontSize: 16,
-                                            //               ),
-                                            //             ),
-                                            //           ),
-                                            //         ),
-                                            //         Expanded(
-                                            //           child: Text(
-                                            //             "${e.texte}",
-                                            //             textAlign:
-                                            //                 TextAlign.center,
-                                            //             style:
-                                            //                 GoogleFonts.openSans(
-                                            //               color: Colors.black,
-                                            //               textStyle: TextStyle(
-                                            //                 fontSize: 16,
-                                            //               ),
-                                            //             ),
-                                            //           ),
-                                            //         ),
-                                            //       ],
-                                            //     ),
-                                            //     style: OutlinedButton.styleFrom(
-                                            //       primary: Colors.teal,
-                                            //       backgroundColor:
-                                            //           selectedUserResponse == e.id
-                                            //               ? HexColor("#58CC02")
-                                            //                   .withOpacity(.5)
-                                            //               : null,
-                                            //       shape: RoundedRectangleBorder(
-                                            //         borderRadius:
-                                            //             BorderRadius.circular(
-                                            //                 16.0),
-                                            //       ),
-                                            //     ),
-                                            //     onPressed: () {
-                                            //       setState(() {
-                                            //         selectedUserResponse = e.id!;
-                                            //       });
-                                            //     },
-                                            //   ),
-                                            // ),
-                                            ),
-                                      )
-                                      .toList(),
-                                  SizedBox(height: screenSize.height * .07),
-                                  SizedBox(
-                                    height: screenSize.height * .065,
-                                    width: double.infinity,
-                                    child: FancyButton(
-                                      child: Center(
-                                        child: Text(
-                                          "Continuer",
-                                          style: GoogleFonts.openSans(
-                                            color: Colors.white,
-                                            textStyle: TextStyle(
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      size: 18,
-                                      color: HexColor("#58CC02"),
-                                      onPressed: () async {
-                                        if (selectedUserResponse.isEmpty) {
-                                          Fluttertoast.showToast(
-                                              msg:
-                                                  "Veuillez choisir une réponse",
-                                              toastLength: Toast.LENGTH_SHORT,
-                                              gravity: ToastGravity.BOTTOM,
-                                              timeInSecForIosWeb: 4,
-                                              backgroundColor:
-                                                  HexColor("#58CC02"),
-                                              textColor: Colors.white,
-                                              fontSize: 16.0);
-                                        } else {
-                                          if (selectedUserResponse ==
-                                              q.correct!.id) {
-                                            setState(() {
-                                              nbretrouves = nbretrouves + 1;
-                                            });
-                                            showModalBottomSheet<void>(
-                                                context: context,
-                                                isDismissible: false,
-                                                builder:
-                                                    (BuildContext context) {
-                                                  return QuizDialog(
-                                                    height:
-                                                        screenSize.height * .2,
-                                                    backgroundcolor:
-                                                        HexColor("#58CC02")
-                                                            .withOpacity(.1),
-                                                    foregroundcolor:
-                                                        HexColor("#58CC02")
-                                                            .withOpacity(.8),
-                                                    texte: "Bonne réponse",
-                                                    onpress: () {
-                                                      if (indexpage ==
-                                                          quest!.length) {
-                                                        TheLogger.Logger().d(
-                                                            "nbretrouves $nbretrouves : nbretotal $indexpage");
+        centerTitle: true,
+        title: Container(
+          margin: EdgeInsets.symmetric(vertical: 20),
+          width: screenSize.width,
+          height: 9,
+          child: ClipRRect(
+            borderRadius: BorderRadius.all(
+              Radius.circular(10),
+            ),
+            child: LinearProgressIndicator(
+              value: ((currentSelected == 0 ? 1 : currentSelected) /
+                  topic[2].quizs.length),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                Color(0xff58CC02),
+              ),
+              backgroundColor: Color(0xffE5E5E5),
+            ),
+          ),
+        ));
+    return Scaffold(
+      backgroundColor: AppTheme.scaffoldBgColor,
+      appBar: appBar,
+      body: SafeArea(
+        child: GestureDetector(
+          onHorizontalDragStart: (detail) {},
+          child: Stack(
+            children: [
+              Container(
+                height: screenSize.height * .8,
+                alignment: Alignment.topCenter,
+                margin:
+                    EdgeInsets.symmetric(horizontal: screenSize.width * .045),
+                padding: EdgeInsets.symmetric(
+                    horizontal: screenSize.width * .05,
+                    vertical: screenSize.height * .02),
+                decoration: BoxDecoration(
+                    color: AppTheme.whiteColor,
+                    borderRadius: BorderRadius.circular(21)),
+                child: GestureDetector(
+                  onHorizontalDragStart: (detail) {},
+                  child: ListView(
+                    children: [
+                      Center(
+                        child: Text(
+                          topic[2].quizs.first.title,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                      ),
+                      Padding(
+                          padding: EdgeInsets.all(20),
+                          child: Column(
+                              children: topic[2]
+                                  .quizs[currentSelected]
+                                  .proposition
+                                  .map((e) => Container(
+                                        width: double.infinity,
+                                        margin: const EdgeInsets.only(top: 8),
+                                        padding: const EdgeInsets.only(
+                                            right: 8.0, top: 8),
+                                        child: FancyButton(
+                                          size: 18,
+                                          duration:
+                                              const Duration(milliseconds: 160),
+                                          onPressed: () {
+                                            if (topic[2]
+                                                    .quizs[currentSelected]
+                                                    .correctAnswer ==
+                                                e) {
+                                              _audioPlayer.play(AssetSource(
+                                                  'audio/duolingo_correct.mp3'));
 
-                                                        Navigator
-                                                            .pushAndRemoveUntil(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  Congratulations(
-                                                                    nbretrouves:
-                                                                        nbretrouves,
-                                                                    nbretotal:
-                                                                        indexpage,
-                                                                    questions:
-                                                                        quest,
-                                                                  )),
-                                                          (route) => false,
-                                                        );
-                                                      } else {
-                                                        Navigator.pop(context);
-                                                        nextPage();
-                                                      }
-                                                    },
-                                                  );
-                                                });
-                                          } else {
-                                            showModalBottomSheet<void>(
-                                                context: context,
-                                                isDismissible: false,
-                                                builder:
-                                                    (BuildContext context) {
-                                                  return QuizDialog(
-                                                    height:
-                                                        screenSize.height * .6,
-                                                    backgroundcolor:
-                                                        HexColor("#FFDFE0"),
-                                                    foregroundcolor:
-                                                        HexColor("#FF4B4B"),
-                                                    texte: "Mauvais réponse",
-                                                    onpress: () {
-                                                      if (indexpage ==
-                                                          quest!.length) {
-                                                        TheLogger.Logger().d(
-                                                            "nbretrouves $nbretrouves : nbretotal $indexpage");
-                                                        Navigator.of(context).push(
-                                                            MaterialPageRoute(
-                                                                builder:
-                                                                    (context) =>
-                                                                        Congratulations(
-                                                                          nbretrouves:
-                                                                              nbretrouves,
-                                                                          nbretotal:
-                                                                              indexpage,
-                                                                          questions:
-                                                                              quest,
-                                                                        )));
-                                                      } else {
-                                                        Navigator.pop(context);
-                                                        nextPage();
-                                                      }
-                                                    },
-                                                  );
-                                                });
-                                          }
-                                        }
-                                      },
-                                      duration:
-                                          const Duration(milliseconds: 160),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }),
+                                              _quizAnswer(
+                                                  isSussess: true,
+                                                  quiz: topic[2]
+                                                      .quizs[currentSelected]);
+                                            } else {
+                                              _audioPlayer.play(AssetSource(
+                                                  'audio/duolingo_false.mp3'));
+
+                                              _quizAnswer(
+                                                  isSussess: false,
+                                                  quiz: topic[2]
+                                                      .quizs[currentSelected]);
+                                            }
+                                          },
+                                          child: Center(
+                                              child: Text(
+                                            e,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(fontSize: 22),
+                                          )),
+                                          color: false
+                                              ? AppTheme.secondaryLightBg
+                                              : AppTheme.whiteColor,
+                                        ),
+                                      ))
+                                  .toList()))
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 0,
+                left: screenSize.width * .18,
+                child: SizedBox(
+                  height: screenSize.height * .07,
+                  width: screenSize.width * .6,
+                  child: FancyButton(
+                    child: Center(
+                      child: Text(
+                        "Voir les réponses",
+                        style: GoogleFonts.openSans(
+                          color: AppTheme.whiteColor,
+                          textStyle: TextStyle(
+                            fontSize: dimensH(2.8 * SizeConfig.textMultiplier,
+                                sm: 20),
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
                     ),
-                  )
-                : Center(
-                    child: SpinKitWave(
-                      color: AppTheme.successColor, // HexColor("#235390"),
-                      size: 25,
-                      controller: animationcontroller,
-                    ),
-                  )),
+                    size: 18,
+                    color: AppTheme.primaryColor,
+                    onPressed: () {
+                      Navigator.of(context).pushNamed("/see_answer_quiz");
+                    },
+                    duration: const Duration(milliseconds: 160),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  _quizAnswer({required bool isSussess, required QuizResponse quiz}) {
+    if (isSussess) {
+      setState(() {
+        nbretrouves++;
+      });
+      showModalBottomSheet<void>(
+          context: context,
+          isDismissible: false,
+          builder: (BuildContext context) {
+            return QuizDialog(
+              height: 300,
+              backgroundcolor: HexColor("#58CC02").withOpacity(.1),
+              foregroundcolor: HexColor("#58CC02").withOpacity(.8),
+              texte: "Bonne réponse",
+              onpress: () {
+                nextPage(quiz);
+              },
+            );
+          });
+    } else {
+      showModalBottomSheet<void>(
+          context: context,
+          isDismissible: false,
+          builder: (BuildContext context) {
+            return QuizDialog(
+              height: 300,
+              backgroundcolor: HexColor("#FFDFE0"),
+              foregroundcolor: HexColor("#FF4B4B"),
+              texte: "Mauvais réponse",
+              onpress: () {
+                nextPage(quiz);
+              },
+            );
+          });
+    }
+  }
+
+  nextPage(QuizResponse quiz) {
+    if (topic[2].quizs.indexOf(quiz) == topic[2].quizs.length - 1) {
+      TheLogger.Logger()
+          .d("nbretrouves $nbretrouves : nbretotal ${topic[2].quizs.length}");
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => Congratulations(
+                nbretrouves: nbretrouves,
+                nbretotal: topic[2].quizs.length,
+              )));
+    } else {
+      Navigator.pop(context);
+      setState(() {
+        currentSelected++;
+      });
+      // nextPage(topic[2].quizs[topic[2].quizs.indexOf(quiz) + 1]);
+    }
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
 
 class AudioRecordingService {
@@ -11,22 +12,37 @@ class AudioRecordingService {
   }
 
   Future<void> initialize() async {
-    await _requestPermissions();
+    await requestPermissions();
   }
 
-  Future<void> _requestPermissions() async {
-
+  Future<bool> getStatus() async {
+    return Permission.microphone.status.isGranted;
   }
 
-  Future<String?> startRecording() async {
+  Future<void> requestPermissions() async {
+    await Permission.microphone.request();
+    await Permission.manageExternalStorage.request();
+  }
+
+
+
+    Future<String?> startRecording() async {
     try {
-      Directory tempDir = await getTemporaryDirectory();
-      _filePath = '${tempDir.path}/audio_recording.wav';
+      Directory tempDir;
+
+      if (Platform.isIOS) {
+        tempDir = await getApplicationDocumentsDirectory();
+      } else {
+        tempDir = (await getExternalStorageDirectory())!;
+      }
+      _filePath = '${tempDir.path + DateTime.now().millisecondsSinceEpoch.toString()}/audio_recording.wav';
 
       await _audioRecorder.start(
         RecordConfig(),
         path: _filePath,
       );
+
+      print(_filePath);
 
       return _filePath;
     } catch (e) {

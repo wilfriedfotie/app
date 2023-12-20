@@ -7,6 +7,7 @@ import 'package:LASYLAB/core/components/styling.dart';
 import 'package:LASYLAB/core/size_config.dart';
 import 'package:LASYLAB/core/utils.dart';
 import 'package:LASYLAB/feature/authentication/presentation/pages/choose_strong_topics.dart';
+import 'package:LASYLAB/feature/formation/presentation/formation_screen.dart';
 import 'package:LASYLAB/services/auth_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
@@ -478,6 +479,44 @@ class _RegisterPageState extends State<RegisterPage>
                                       ],
                                     ),
                                   ),
+                                  SizedBox(height: 20,),
+                                  Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.center,
+                                    children: [
+                                      InkWell(
+                                        onTap: () {
+                                         Navigator.of(context).pushNamed(FormationScreen.routeName);
+                                        },
+                                        child: Image.asset(
+                                            Images
+                                                .formation, fit: BoxFit.contain,),
+                                      ),
+                                      SizedBox(
+                                        height:
+                                        screenSize.height * .01,
+                                      ),
+                                      Text("Formation",
+                                          textAlign:
+                                          TextAlign.center,
+                                          style: TextStyle(
+                                              fontSize: dimensH(
+                                                2.3 *
+                                                    SizeConfig
+                                                        .textMultiplier,
+                                                sm: 15,
+                                              ),
+                                              fontFamily: GoogleFonts
+                                                  .openSans()
+                                                  .fontFamily,
+                                              fontWeight:
+                                              FontWeight.w700,
+                                              color: AppTheme
+                                                  .textBlackColor))
+                                    ],
+                                  ),
+
+
                                   SizedBox(
                                     height: dimensH(screenSize.height * .13,
                                         sm: screenSize.height * .3),

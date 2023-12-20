@@ -4,11 +4,18 @@ import 'package:LASYLAB/core/components/styling.dart';
 import 'package:LASYLAB/core/size_config.dart';
 import 'package:LASYLAB/feature/courses/data/mocks/fake_subjects_quiz.dart';
 import 'package:LASYLAB/feature/courses/presentation/widgets/video_player.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hexcolor/hexcolor.dart';
+import 'package:logger/logger.dart' as TheLogger;
+import '../../../../components/quizdialog.dart';
+import '../../../../views/congratulation.dart';
+import '../../data/models/response/quiz_response.dart';
 
 class VideoCourseReading extends StatefulWidget {
   static const routeName = "/course_status";
+
   const VideoCourseReading({Key? key}) : super(key: key);
 
   @override
@@ -21,6 +28,8 @@ class _VideoCourseReadingState extends State<VideoCourseReading>
   late Animation _colorTween;
   bool isVideoReading = true;
   final topic = fakeSubjectQuizzes;
+  final _audioPlayer = AudioPlayer()..setReleaseMode(ReleaseMode.stop);
+  int nbretrouves = 0, currentSelected = 0;
 
   @override
   void initState() {
@@ -35,7 +44,7 @@ class _VideoCourseReadingState extends State<VideoCourseReading>
 
   Future changeColors() async {
     while (true) {
-      await new Future.delayed(const Duration(seconds: 1), () {
+      await Future.delayed(const Duration(seconds: 1), () {
         if (_animationController.status == AnimationStatus.completed) {
           _animationController.reverse();
         } else {
@@ -78,7 +87,8 @@ class _VideoCourseReadingState extends State<VideoCourseReading>
                     Radius.circular(10),
                   ),
                   child: LinearProgressIndicator(
-                    value: 0,
+                    value: ((currentSelected == 0 ? 1 : currentSelected) /
+                        topic[2].quizs.length),
                     valueColor: AlwaysStoppedAnimation<Color>(
                       Color(0xff58CC02),
                     ),
@@ -121,11 +131,12 @@ class _VideoCourseReadingState extends State<VideoCourseReading>
                     left: screenSize.width * .4,
                     child: GestureDetector(
                       onHorizontalDragDown: (value) {
+                        Navigator.of(context).pushNamed("/course_reading");
+                        return;
                         print("the tapdata : $value");
                         setState(() {
                           isVideoReading = false;
                         });
-                        // Navigator.of(context).pushNamed("/course_reading");
                       },
                       child: Container(
                         height: dimensH(screenSize.height * .13,
@@ -149,7 +160,7 @@ class _VideoCourseReadingState extends State<VideoCourseReading>
                               height: dimensH(screenSize.height * .02,
                                   sm: screenSize.height * .01),
                             ),
-                            Text("QCM",
+                            Text("Cours",
                                 style: TextStyle(
                                     fontSize: dimensH(
                                         2.5 * SizeConfig.textMultiplier,
@@ -232,7 +243,7 @@ class _VideoCourseReadingState extends State<VideoCourseReading>
                                 padding: EdgeInsets.all(20),
                                 child: Column(
                                     children: topic[2]
-                                        .quizs[2]
+                                        .quizs[currentSelected]
                                         .proposition
                                         .map((e) => Container(
                                               width: double.infinity,
@@ -245,7 +256,27 @@ class _VideoCourseReadingState extends State<VideoCourseReading>
                                                 duration: const Duration(
                                                     milliseconds: 160),
                                                 onPressed: () {
-                                                  setState(() {});
+                                                  if (topic[2]
+                                                          .quizs[
+                                                              currentSelected]
+                                                          .correctAnswer ==
+                                                      e) {
+                                                    _audioPlayer.play(AssetSource(
+                                                        'audio/duolingo_correct.mp3'));
+
+                                                    _quizAnswer(
+                                                        isSussess: true,
+                                                        quiz: topic[2].quizs[
+                                                            currentSelected]);
+                                                  } else {
+                                                    _audioPlayer.play(AssetSource(
+                                                        'audio/duolingo_false.mp3'));
+
+                                                    _quizAnswer(
+                                                        isSussess: false,
+                                                        quiz: topic[2].quizs[
+                                                            currentSelected]);
+                                                  }
                                                 },
                                                 child: Center(
                                                     child: Text(
@@ -273,7 +304,7 @@ class _VideoCourseReadingState extends State<VideoCourseReading>
                         child: FancyButton(
                           child: Center(
                             child: Text(
-                              "Voir les reponses",
+                              "Voir les réponses",
                               style: GoogleFonts.openSans(
                                 color: AppTheme.whiteColor,
                                 textStyle: TextStyle(
@@ -299,5 +330,67 @@ class _VideoCourseReadingState extends State<VideoCourseReading>
               ),
             ),
     );
+  }
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  _quizAnswer({required bool isSussess, required QuizResponse quiz}) {
+    if (isSussess) {
+      setState(() {
+        nbretrouves++;
+      });
+      showModalBottomSheet<void>(
+          context: context,
+          isDismissible: false,
+          builder: (BuildContext context) {
+            return QuizDialog(
+              height: 300,
+              backgroundcolor: HexColor("#58CC02").withOpacity(.1),
+              foregroundcolor: HexColor("#58CC02").withOpacity(.8),
+              texte: "Bonne réponse",
+              onpress: () {
+                nextPage(quiz);
+              },
+            );
+          });
+    } else {
+      showModalBottomSheet<void>(
+          context: context,
+          isDismissible: false,
+          builder: (BuildContext context) {
+            return QuizDialog(
+              height: 300,
+              backgroundcolor: HexColor("#FFDFE0"),
+              foregroundcolor: HexColor("#FF4B4B"),
+              texte: "Mauvais réponse",
+              onpress: () {
+                nextPage(quiz);
+              },
+            );
+          });
+    }
+  }
+
+  nextPage(QuizResponse quiz) {
+    if (topic[2].quizs.indexOf(quiz) == topic[2].quizs.length - 1) {
+      TheLogger.Logger()
+          .d("nbretrouves $nbretrouves : nbretotal ${topic[2].quizs.length}");
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => Congratulations(
+                nbretrouves: nbretrouves,
+                nbretotal: topic[2].quizs.length,
+              )));
+    } else {
+      Navigator.pop(context);
+      setState(() {
+        currentSelected++;
+      });
+      // nextPage(topic[2].quizs[topic[2].quizs.indexOf(quiz) + 1]);
+    }
   }
 }

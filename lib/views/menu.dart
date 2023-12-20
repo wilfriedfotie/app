@@ -3,6 +3,7 @@ import 'package:LASYLAB/core/components/bottomBar/navBarItemClass.dart';
 import 'package:LASYLAB/core/components/images.dart';
 import 'package:LASYLAB/feature/activities/presentation/pages/activities.dart';
 import 'package:LASYLAB/feature/courses/presentation/page/home.dart';
+import 'package:LASYLAB/views/status_page.dart';
 import 'package:flutter/material.dart';
 
 import '../feature/chat/presentation/pages/chat_page.dart';
@@ -36,7 +37,16 @@ class _MenuState extends State<Menu> {
         svg: Images.chat_icon,
         onSelected: () {
           print("view the page : 3");
-        })
+        }),
+
+    NavBarItem(
+        id: 3,
+        svg: Images.statusLogo,
+        onSelected: () {
+          print("view the page : 4");
+        }),
+
+
   ];
 
   @override
@@ -62,6 +72,7 @@ class _MenuState extends State<Menu> {
           HomePage(),
           ActivitiesPage(),
           ChatPage(),
+          StatusPage(),
           //ResearchPage(),
         ],
       ),

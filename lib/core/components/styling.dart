@@ -27,6 +27,7 @@ class AppTheme {
   static const Color errorColor = Color(0xffFF4B4B);
   static const Color warningColor = Color(0xffFFD900);
   static const Color successColor = Color(0xff58CC02);
+  static const Color formationCardColor = Color(0xffEBEBA1);
 
   // defined theme
   static final ThemeData lightTheme = ThemeData(

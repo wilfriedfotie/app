@@ -8,6 +8,7 @@ import '../../../../components/fancy_button.dart';
 import '../../../../core/components/styling.dart';
 import '../../../../core/gap.dart';
 import '../../../../views/fees_welcome.dart';
+import '../../../../views/menu.dart';
 
 class ChooseStrongTopics extends StatefulWidget {
   static String routeName = "/chooseStrongTopics";
@@ -76,7 +77,7 @@ class _ChooseStrongTopicsState extends State<ChooseStrongTopics> {
               child: FancyButton(
                 horzPadding: 50,
                 onPressed: () {
-                  Navigator.of(context).pushNamed(HomePage.routeName);
+                  Navigator.of(context).pushNamed(Menu.routeName);
                 },
                 child: Center(
                   child: Text("Essayer lasylab",

@@ -206,6 +206,45 @@ class _AccountChoicePageState extends State<AccountChoicePage> {
                         ],
                       ),
                     ),
+                    Column(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              isSelectedStudent = !isSelectedStudent;
+                              isSelectedParent = !isSelectedStudent;
+                            });
+                          },
+                          child: SizedBox(
+                            height: screenSize.height * 0.16,
+                            width: screenSize.width * 0.35,
+                            child: isSelectedStudent
+                                ? AccountChoiceCard(
+                              illustration:
+                              "assets/svg/children_choice.svg",
+                              isSelected: true,
+                            )
+                                : AccountChoiceCard(
+                              illustration:
+                              "assets/svg/children_choice.svg",
+                            ),
+                          ),
+                        ),
+                        FittedBox(
+                          child: Text(
+                            "Elève",
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.openSans(
+                              color: Colors.black,
+                              textStyle: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                     isSelectedStudent || isSelectedParent
                         ? Container(
                             margin: const EdgeInsets.only(

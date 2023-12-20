@@ -6,6 +6,7 @@ import 'package:LASYLAB/feature/authentication/logic/bloc/user/user_bloc.dart';
 import 'package:LASYLAB/feature/chat/logic/bloc/bloc/chat_bloc.dart';
 import 'package:LASYLAB/feature/chat/data/response/group_response.dart';
 import 'package:LASYLAB/feature/chat/presentation/pages/discussion_page.dart';
+import 'package:LASYLAB/feature/chat/presentation/pages/test_recorder.dart';
 import 'package:LASYLAB/feature/chat/repository/user_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -88,7 +89,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         backgroundColor: Colors.white,
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            // Navigator.of(context).pushNamed("/discussions");
+            Navigator.of(context).pushNamed(TestRecorder.routeName);
           },
           child: Container(
             child: Padding(

@@ -10,13 +10,14 @@ import 'package:LASYLAB/feature/chat/logic/cubit/message/message_cubit.dart';
 import 'package:LASYLAB/feature/chat/data/request/message_request.dart';
 import 'package:LASYLAB/feature/chat/data/response/group_response.dart';
 import 'package:LASYLAB/feature/chat/data/response/user_response.dart';
+import 'package:LASYLAB/feature/chat/presentation/pages/test_recorder.dart';
 import 'package:LASYLAB/feature/chat/presentation/widget/image_choose_widget.dart';
 import 'package:LASYLAB/feature/chat/provider/chat_provider.dart';
 import 'package:LASYLAB/feature/chat/service/audio_recording_service.dart';
 import 'package:LASYLAB/forms/message_widget.dart';
 import 'package:LASYLAB/models/message.dart';
 import 'package:LASYLAB/models/user.dart';
-import 'package:LASYLAB/services/permission_service.dart';
+import 'package:LASYLAB/services/audio_service/audio_recorder.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,12 +25,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:image_picker/image_picker.dart';
 
 class DiscussionPage extends StatefulWidget {
   static const routeName = "/discussions";
+
   const DiscussionPage({Key? key, this.user}) : super(key: key);
   final Usermodel? user;
+
   @override
   _DiscussionPageState createState() => _DiscussionPageState();
 }
@@ -43,11 +45,13 @@ class _DiscussionPageState extends State<DiscussionPage>
   File? _image;
   bool _loading = false, _hasMore = false;
   int nbre = 20;
+  bool _isVoiceRecorde = false;
   DocumentSnapshot? lastDocument;
   late AudioRecordingService _audioRecordingService =
       GetIt.instance<AudioRecordingService>();
-  late PermissionHandlerService _permissions =
-      GetIt.instance<PermissionHandlerService>();
+
+  bool showPlayer = false;
+
   @override
   void initState() {
     super.initState();
@@ -263,8 +267,10 @@ class _DiscussionPageState extends State<DiscussionPage>
                             if (_hasMore)
                               Container(
                                 padding: const EdgeInsets.all(8.0),
-                                child:
-                                    Center(child: CircularProgressIndicator(strokeWidth: 2,)),
+                                child: Center(
+                                    child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                )),
                               ),
                           ]);
                     }
@@ -280,77 +286,92 @@ class _DiscussionPageState extends State<DiscussionPage>
             padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 18),
             child: Column(
               children: [
-                if(_image is File) Stack(
-                  children: [
-                    Image.file(_image!, height: 200,),
-                    Positioned(
-                      right: 0,
-                      top: 0,
-                      child: IconButton(onPressed: (){
-                        setState(() {
-                          _image = null;
-                        });
-                      }, icon: Container(
-                          padding: EdgeInsets.all(6),
-                          decoration: BoxDecoration(color: Theme.of(context).colorScheme.background, shape: BoxShape.circle),
-                          child: Icon(Icons.close))),
-                    )
-                  ],
-                ),
+                if (_image is File)
+                  Stack(
+                    children: [
+                      Image.file(
+                        _image!,
+                        height: 200,
+                      ),
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        child: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                _image = null;
+                              });
+                            },
+                            icon: Container(
+                                padding: EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .background,
+                                    shape: BoxShape.circle),
+                                child: Icon(Icons.close))),
+                      )
+                    ],
+                  ),
                 Row(
                   children: [
-                    Expanded(
-                      child: TextFormField(
-                          maxLines: 7,
-                          keyboardType: TextInputType.multiline,
-                          minLines: 1,
-                          controller: _controller,
-                          autocorrect: true,
-                          textCapitalization: TextCapitalization.sentences,
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.symmetric(
-                                horizontal: screenSize.width * .05),
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30.0),
-                                borderSide: BorderSide(
-                                  color: AppTheme.grayColor,
-                                )),
-                            focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30.0),
-                                borderSide: BorderSide(
-                                  color: AppTheme.grayColor,
-                                )),
-                            filled: true,
-                            hintStyle: TextStyle(
-                                color: AppTheme.grayColor,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 14),
-                            hintText: "Message",
-                            fillColor: Color(0xffF7F7F7),
-                            suffixIcon: GestureDetector(
-                              onTap: () async {
-                                // await getImage();
-                              },
-                              child: IconButton(
-                                  onPressed: () async {
-                                    final result = await showModalBottomSheet(
-                                        context: context,
-                                        builder: (BuildContext bc) {
-                                          return const GetImage(rad: true);
-                                        });
+                    _isVoiceRecorde
+                        ? Container()
+                        : Expanded(
+                            child: TextFormField(
+                                maxLines: 7,
+                                keyboardType: TextInputType.multiline,
+                                minLines: 1,
+                                controller: _controller,
+                                autocorrect: true,
+                                textCapitalization:
+                                    TextCapitalization.sentences,
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(
+                                      horizontal: screenSize.width * .05),
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(30.0),
+                                      borderSide: BorderSide(
+                                        color: AppTheme.grayColor,
+                                      )),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(30.0),
+                                      borderSide: BorderSide(
+                                        color: AppTheme.grayColor,
+                                      )),
+                                  filled: true,
+                                  hintStyle: TextStyle(
+                                      color: AppTheme.grayColor,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 14),
+                                  hintText: "Message",
+                                  fillColor: Color(0xffF7F7F7),
+                                  suffixIcon: GestureDetector(
+                                    onTap: () async {
+                                      // await getImage();
+                                    },
+                                    child: IconButton(
+                                        onPressed: () async {
+                                          final result =
+                                              await showModalBottomSheet(
+                                                  context: context,
+                                                  builder: (BuildContext bc) {
+                                                    return const GetImage(
+                                                        rad: true);
+                                                  });
 
-                                    setState(() {
-                                      _image = result;
-                                    });
-                                  },
-                                  icon: Icon(
-                                    Icons.image,
-                                    color: Colors.black, // HexColor("#AFAFAF"),
-                                  )),
-                            ),
-                          )),
-                    ),
-
+                                          setState(() {
+                                            _image = result;
+                                          });
+                                        },
+                                        icon: Icon(
+                                          Icons.image,
+                                          color: Colors
+                                              .black, // HexColor("#AFAFAF"),
+                                        )),
+                                  ),
+                                )),
+                          ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: InkWell(
@@ -358,27 +379,50 @@ class _DiscussionPageState extends State<DiscussionPage>
                           if (_controller.text.isNotEmpty) {
                             // response
 
-                            context.read<MessageCubit>().sendMessage(MessageRequest(
-                                message: _controller.text.trim(),
-                                createdAt: DateTime.now(),
-                                type: MessageResponseType.text,
-                                isAnswer: false,
-                                sender: UserResponse(
-                                    id: response.initiator.id, name: "Wilfried"),
-                                chat: response));
+                            context.read<MessageCubit>().sendMessage(
+                                MessageRequest(
+                                    message: _controller.text.trim(),
+                                    createdAt: DateTime.now(),
+                                    type: MessageResponseType.text,
+                                    isAnswer: false,
+                                    sender: UserResponse(
+                                        id: response.initiator.id,
+                                        name: "Wilfried"),
+                                    chat: response));
                           } else {
-
-                            await _audioRecordingService.startRecording();
+                            if (showPlayer) {
+                              _audioRecordingService
+                                  .stopRecording()
+                                  .then((value) {
+                                setState(() {
+                                  showPlayer = !showPlayer;
+                                });
+                              });
+                              return;
+                            }
+                            await _audioRecordingService.requestPermissions();
+                            _audioRecordingService
+                                .startRecording()
+                                .then((value) {
+                              setState(() {
+                                showPlayer = !showPlayer;
+                              });
+                            });
                           }
                         },
                         child: Container(
+                          width: _isVoiceRecorde
+                              ? MediaQuery.of(context).size.width / 1.2
+                              : null,
                           padding: EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color(0xffF7F7F7),
-                              border: Border.all(
-                                color: AppTheme.grayColor,
-                              )),
+                          decoration: _isVoiceRecorde
+                              ? BoxDecoration()
+                              : BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Color(0xffF7F7F7),
+                                  border: Border.all(
+                                    color: AppTheme.grayColor,
+                                  )),
                           alignment: Alignment.center,
                           child: BlocConsumer<MessageCubit, MessageState>(
                             listener: (context, state) {
@@ -400,6 +444,10 @@ class _DiscussionPageState extends State<DiscussionPage>
                               return ValueListenableBuilder(
                                   valueListenable: _controller,
                                   builder: (context, val, __) {
+                                    if (val.text.trim().isEmpty &&
+                                        _image is! File) {
+                                      return TestRecorder();
+                                    }
                                     return Icon(
                                       val.text.trim().isEmpty && _image is! File
                                           ? Icons.mic_none

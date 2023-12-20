@@ -135,6 +135,7 @@ Widget StepOne({required Size screenSize, required int step}) {
             ],
           ),
         ),
+
         SizedBox(
           height: screenSize.height * .3,
         ),

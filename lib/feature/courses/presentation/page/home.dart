@@ -4,7 +4,6 @@ import 'package:LASYLAB/core/size_config.dart';
 import 'package:LASYLAB/feature/courses/data/models/home_course_item.dart';
 import 'package:LASYLAB/feature/courses/presentation/widgets/course_item.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 
@@ -21,7 +20,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-
     super.initState();
   }
 
@@ -101,92 +99,88 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: SafeArea(
-        child: Center(
-          child: ListView(
-            physics: BouncingScrollPhysics(),
-            children: [
-              Center(
-                child: DropdownButton(
-                    icon: Icon(
-                      Icons.keyboard_arrow_down_outlined,
-                      size: 35,
-                      color: AppTheme.grayColor,
-                    ),
-                    underline: SizedBox(),
-                    onChanged: (value) {
-                      print("the value selected : $value");
-                      setState(() {
-                        _value = int.parse(value.toString());
-                      });
-                    },
-                    value: _value,
-                    items: [
-                      {"id": 1, "value": "Seconde"},
-                      {"id": 2, "value": "Première"},
-                      {"id": 3, "value": "Terminale"},
-                    ]
-                        .map((e) => DropdownMenuItem(
-                              child: Text(
-                                "${e["value"]}",
-                                style: GoogleFonts.openSans(
-                                  color: Colors.black,
-                                  textStyle: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+      body: ListView(
+        physics: BouncingScrollPhysics(),
+        children: [
+          Center(
+            child: DropdownButton(
+                icon: Icon(
+                  Icons.keyboard_arrow_down_outlined,
+                  size: 35,
+                  color: AppTheme.grayColor,
+                ),
+                underline: SizedBox(),
+                onChanged: (value) {
+                  print("the value selected : $value");
+                  setState(() {
+                    _value = int.parse(value.toString());
+                  });
+                },
+                value: _value,
+                items: [
+                  {"id": 1, "value": "Seconde"},
+                  {"id": 2, "value": "Première"},
+                  {"id": 3, "value": "Terminale"},
+                ]
+                    .map((e) => DropdownMenuItem(
+                          child: Text(
+                            "${e["value"]}",
+                            style: GoogleFonts.openSans(
+                              color: Colors.black,
+                              textStyle: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                               ),
-                              value: e["id"],
-                            ))
-                        .toList()),
-              ),
-              Center(
-                child: Container(
-                  margin: EdgeInsets.symmetric(vertical: 20),
-                  width: screenSize.width * 0.7,
-                  height: 10,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(10),
-                    ),
-                    child: LinearProgressIndicator(
-                      value: 0,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        HexColor("#FFD900"),
-                      ),
-                      backgroundColor: HexColor("#E1E1E1"),
-                    ),
+                            ),
+                          ),
+                          value: e["id"],
+                        ))
+                    .toList()),
+          ),
+          Center(
+            child: Container(
+              margin: EdgeInsets.symmetric(vertical: 20),
+              width: screenSize.width * 0.7,
+              height: 10,
+              child: ClipRRect(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(10),
+                ),
+                child: LinearProgressIndicator(
+                  value: 0,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    HexColor("#FFD900"),
                   ),
+                  backgroundColor: HexColor("#E1E1E1"),
                 ),
               ),
-              GridView.count(
-                shrinkWrap: true,
-                primary: false,
-                padding: EdgeInsets.only(
-                    top: dimensH(10, sm: 20),
-                    bottom: 20,
-                    left: dimensW(10, sm: 20),
-                    right: dimensW(10, sm: 20)),
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                crossAxisCount: 2,
-                children: <Widget>[
-                  ...courseData
-                      .map((e) => CourseItem(
-                            backgroundColor: e.courseName == "Philosophie"
-                                ? AppTheme.primaryColor
-                                : AppTheme.blueColor,
-                            courseName: e.courseName,
-                            image: e.image,
-                            progression: e.progression,
-                          ))
-                      .toList()
-                ],
-              ),
+            ),
+          ),
+          GridView.count(
+            shrinkWrap: true,
+            primary: false,
+            padding: EdgeInsets.only(
+                top: dimensH(10, sm: 20),
+                bottom: 20,
+                left: dimensW(10, sm: 20),
+                right: dimensW(10, sm: 20)),
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            crossAxisCount: 2,
+            children: <Widget>[
+              ...courseData
+                  .map((e) => CourseItem(
+                        backgroundColor: e.courseName == "Philosophie"
+                            ? AppTheme.primaryColor
+                            : AppTheme.blueColor,
+                        courseName: e.courseName,
+                        image: e.image,
+                        progression: e.progression,
+                      ))
+                  .toList()
             ],
           ),
-        ),
+        ],
       ),
     );
   }

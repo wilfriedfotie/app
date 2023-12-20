@@ -22,10 +22,11 @@ class Images {
       'assets/images/good_response_icon.png';
   static const String download_file_icon =
       'assets/images/download_file_icon.png';
-
   static const String eleveIllustration = 'assets/images/girl.svg';
   static const String parentIllustration = 'assets/images/family.svg';
   static const String masquotte = 'assets/images/mascotte.svg';
   static const String momo = 'assets/images/momo.png';
   static const String orangeMomney = 'assets/images/orangemoney.png';
+  static const String statusLogo =  'assets/images/status_logo.svg';
+  static const String formation = 'assets/images/formation.png';
 }
